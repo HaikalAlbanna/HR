@@ -14,14 +14,16 @@ try {
 }
 
 $action = $_POST['action'] ?? '';
+$tglLahir = empty($_POST['tgl_lahir'] ?? null) ? null : $_POST['tgl_lahir'];
+
 if ($action === 'create') {
     $stmt = $pdo->prepare('INSERT INTO karyawan (nama, tgl_lahir, gaji) VALUES (?, ?, ?)');
-    $stmt->execute([ $_POST['nama'] ?? null, $_POST['tgl_lahir'] ?? null, $_POST['gaji'] ?? 0 ]);
+    $stmt->execute([ $_POST['nama'] ?? null, $tglLahir, $_POST['gaji'] ?? 0 ]);
     header('Location: index.php');
     exit;
 } elseif ($action === 'update') {
     $stmt = $pdo->prepare('UPDATE karyawan SET nama = ?, tgl_lahir = ?, gaji = ? WHERE id = ?');
-    $stmt->execute([ $_POST['nama'] ?? null, $_POST['tgl_lahir'] ?? null, $_POST['gaji'] ?? 0, $_POST['id'] ]);
+    $stmt->execute([ $_POST['nama'] ?? null, $tglLahir, $_POST['gaji'] ?? 0, $_POST['id'] ]);
     header('Location: index.php');
     exit;
 } elseif ($action === 'delete') {

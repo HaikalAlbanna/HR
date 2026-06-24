@@ -1,25 +1,5 @@
--- HR database and tables + triggers
-CREATE DATABASE IF NOT EXISTS `hr` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `hr`;
-
-CREATE TABLE IF NOT EXISTS `karyawan` (
-  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `nama` VARCHAR(255) NOT NULL,
-  `tgl_lahir` DATE NULL,
-  `gaji` DECIMAL(15,2) NOT NULL DEFAULT 0.00
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE IF NOT EXISTS `tlog` (
-  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `tanggal` DATE NOT NULL,
-  `jam` TIME NOT NULL,
-  `keterangan` TEXT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- Triggers to log insert, update, delete on karyawan
-DROP TRIGGER IF EXISTS `trg_karyawan_after_insert`;
-DROP TRIGGER IF EXISTS `trg_karyawan_after_update`;
-DROP TRIGGER IF EXISTS `trg_karyawan_after_delete`;
+-- Migration SQL for triggers (MySQL)
+-- Run manually after migrations: source this file in the DB
 
 DELIMITER $$
 
@@ -51,5 +31,3 @@ BEGIN
 END$$
 
 DELIMITER ;
-
--- End of schema

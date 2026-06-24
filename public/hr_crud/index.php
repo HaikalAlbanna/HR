@@ -19,13 +19,31 @@ if (!empty($_GET['edit'])) {
 
 $stmt = $pdo->query('SELECT * FROM karyawan ORDER BY id DESC');
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$logs = [];
+try {
+    $stmt = $pdo->query('SELECT * FROM tlog ORDER BY id DESC LIMIT 20');
+    $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $logs = [];
+}
 ?>
 <!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
   <title>CRUD Karyawan</title>
-  <style>body{font-family:Arial,Helvetica,sans-serif}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px}</style>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:32px;background:#f7f7f7;color:#222}
+    form,.panel{background:#fff;border:1px solid #ddd;border-radius:8px;padding:16px;margin-bottom:24px}
+    label{display:block;margin-bottom:10px}
+    input{padding:8px;border:1px solid #bbb;border-radius:4px}
+    button,.btn{padding:8px 12px;border:1px solid #444;border-radius:4px;background:#222;color:#fff;text-decoration:none;cursor:pointer}
+    .btn-secondary{background:#fff;color:#222}
+    table{border-collapse:collapse;width:100%;background:#fff}
+    td,th{border:1px solid #ddd;padding:8px;text-align:left}
+    th{background:#eee}
+  </style>
 </head>
 <body>
   <h1>CRUD Karyawan</h1>
@@ -33,11 +51,11 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <form method="post" action="handle.php">
     <input type="hidden" name="action" value="<?php echo $edit ? 'update' : 'create'; ?>">
     <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo htmlspecialchars($edit['id']); ?>"><?php endif; ?>
-    <label>Nama: <input name="nama" required value="<?php echo $edit ? htmlspecialchars($edit['nama']) : ''; ?>"></label><br>
-    <label>Tgl Lahir: <input name="tgl_lahir" type="date" value="<?php echo $edit ? htmlspecialchars($edit['tgl_lahir']) : ''; ?>"></label><br>
-    <label>Gaji: <input name="gaji" type="number" step="0.01" value="<?php echo $edit ? htmlspecialchars($edit['gaji']) : '0.00'; ?>"></label><br>
+    <label>Nama: <input name="nama" required value="<?php echo $edit ? htmlspecialchars($edit['nama']) : ''; ?>"></label>
+    <label>Tgl Lahir: <input name="tgl_lahir" type="date" value="<?php echo $edit ? htmlspecialchars($edit['tgl_lahir']) : ''; ?>"></label>
+    <label>Gaji: <input name="gaji" type="number" step="0.01" value="<?php echo $edit ? htmlspecialchars($edit['gaji']) : '0.00'; ?>"></label>
     <button type="submit"><?php echo $edit ? 'Update' : 'Create'; ?></button>
-    <?php if ($edit): ?><a href="index.php">Cancel</a><?php endif; ?>
+    <?php if ($edit): ?><a class="btn btn-secondary" href="index.php">Cancel</a><?php endif; ?>
   </form>
 
   <h2>Daftar Karyawan</h2>
@@ -60,5 +78,20 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </tr>
     <?php endforeach; ?>
   </table>
+
+  <h2>Log Aktivitas</h2>
+  <div class="panel">
+    <table>
+      <tr><th>ID</th><th>Tanggal</th><th>Jam</th><th>Keterangan</th></tr>
+      <?php foreach ($logs as $log): ?>
+      <tr>
+        <td><?php echo $log['id']; ?></td>
+        <td><?php echo htmlspecialchars($log['tanggal']); ?></td>
+        <td><?php echo htmlspecialchars($log['jam']); ?></td>
+        <td><?php echo htmlspecialchars($log['keterangan']); ?></td>
+      </tr>
+      <?php endforeach; ?>
+    </table>
+  </div>
 </body>
 </html>

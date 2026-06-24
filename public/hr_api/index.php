@@ -27,12 +27,26 @@ if (!empty($_SERVER['PATH_INFO'])) {
 } else {
     $script = $_SERVER['SCRIPT_NAME'];
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $path = substr($uri, strlen(dirname($script)));
+    if (str_starts_with($uri, $script)) {
+        $path = substr($uri, strlen($script));
+    } else {
+        $path = substr($uri, strlen(dirname($script)));
+    }
 }
 
 $segments = array_values(array_filter(explode('/', $path)));
+if (($segments[0] ?? null) === 'index.php') {
+    array_shift($segments);
+    $segments = array_values($segments);
+}
+
 $resource = $segments[0] ?? null;
 $id = $segments[1] ?? null;
+
+if (!$resource && isset($_GET['resource'])) {
+    $resource = $_GET['resource'];
+    $id = $_GET['id'] ?? null;
+}
 
 if ($resource !== 'karyawan') {
     http_response_code(404);
@@ -46,6 +60,10 @@ function getInputData() {
         $data = $_POST;
     }
     return $data;
+}
+
+function nullableDate($value) {
+    return empty($value) ? null : $value;
 }
 
 try {
@@ -67,7 +85,7 @@ try {
         case 'POST':
             $data = getInputData();
             $stmt = $pdo->prepare('INSERT INTO karyawan (nama, tgl_lahir, gaji) VALUES (?, ?, ?)');
-            $stmt->execute([ $data['nama'] ?? null, $data['tgl_lahir'] ?? null, $data['gaji'] ?? 0 ]);
+            $stmt->execute([ $data['nama'] ?? null, nullableDate($data['tgl_lahir'] ?? null), $data['gaji'] ?? 0 ]);
             $newId = $pdo->lastInsertId();
             http_response_code(201);
             echo json_encode(['id' => $newId]);
@@ -77,7 +95,7 @@ try {
             if (!$id) { http_response_code(400); echo json_encode(['error'=>'Missing id']); break; }
             $data = getInputData();
             $stmt = $pdo->prepare('UPDATE karyawan SET nama = ?, tgl_lahir = ?, gaji = ? WHERE id = ?');
-            $stmt->execute([ $data['nama'] ?? null, $data['tgl_lahir'] ?? null, $data['gaji'] ?? 0, $id ]);
+            $stmt->execute([ $data['nama'] ?? null, nullableDate($data['tgl_lahir'] ?? null), $data['gaji'] ?? 0, $id ]);
             echo json_encode(['updated' => $stmt->rowCount()]);
             break;
 
