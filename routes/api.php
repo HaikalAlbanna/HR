@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthTokenController;
 use App\Http\Controllers\Api\KaryawanController;
 
 /*
@@ -18,8 +19,13 @@ use App\Http\Controllers\Api\KaryawanController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('/karyawan', [KaryawanController::class, 'index']);
-Route::get('/karyawan/{id}', [KaryawanController::class, 'show']);
-Route::post('/karyawan', [KaryawanController::class, 'store']);
-Route::put('/karyawan/{id}', [KaryawanController::class, 'update']);
-Route::delete('/karyawan/{id}', [KaryawanController::class, 'destroy']);
+
+Route::post('/token', [AuthTokenController::class, 'store']);
+
+Route::middleware('jwt')->group(function () {
+    Route::get('/karyawan', [KaryawanController::class, 'index']);
+    Route::get('/karyawan/{id}', [KaryawanController::class, 'show']);
+    Route::post('/karyawan', [KaryawanController::class, 'store']);
+    Route::put('/karyawan/{id}', [KaryawanController::class, 'update']);
+    Route::delete('/karyawan/{id}', [KaryawanController::class, 'destroy']);
+});
